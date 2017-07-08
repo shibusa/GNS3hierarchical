@@ -1,0 +1,69 @@
+version 12.4
+
+ip routing
+ip cef
+
+hostname CORE0{hostnum}
+spanning-tree vlan {ospfvlan} priority {ospfstppriority}
+
+int {loopint}
+ip address 100.0.0.{loopip} 255.255.255.0
+
+int fa0/0
+ip address 1.0.{static}.1 255.255.255.252
+ip nat outside
+no shutdown
+speed 100
+duplex full
+
+int range fa1/{bundleportstart} - {distportend}
+no shutdown
+speed 100
+duplex full
+
+int range fa1/{distportstart} - {distportend}
+switchport access vlan {ospfvlan}
+switchport mode access
+
+int range fa1/{bundleportstart} - {bundleportend}
+switchport access vlan {ospfvlan}
+switchport mode access
+channel-group {bundlenum} mode on
+
+int po{bundlenum}
+switchport access vlan {ospfvlan}
+switchport mode access
+duplex full
+
+int vlan {ospfvlan}
+ip address 172.16.{ospfip}.254 255.255.255.0
+ip ospf priority 255
+ip nat inside
+
+router ospf 1
+router-id 10.2.0.{id}
+network 100.0.0.{loopip} 0.0.0.0 area 0
+network 172.16.{ospfip}.0 0.0.0.255 area 0
+default-information originate
+
+router bgp {ibgpas}
+network 100.0.0.0 mask 255.255.255.0
+neighbor iBGP{ibgpas} peer-group
+neighbor iBGP{ibgpas} remote-as {ibgpas}
+neighbor iBGP{ibgpas} update-source {loopint}
+neighbor eBGP{ebgpas} peer-group
+neighbor eBGP{ebgpas} remote-as {ebgpas}
+neighbor eBGP{ebgpas} update-source {loopint}
+neighbor eBGP{ebgpas} ebgp-multihop 2
+neighbor {ibgpas}.0.0.{ibgpneigh} peer-group iBGP{ibgpas}
+neighbor {ebgpas}.0.0.1 peer-group eBGP{ebgpas}
+
+ip route {ebgpas}.0.0.1 255.255.255.255 1.0.{static}.2
+
+ip access-list standard NAT
+{ospfvlan} permit 172.16.{ospfip}.0 0.0.0.255
+10 permit 10.0.0.0 0.0.255.255
+
+ip nat inside source list NAT interface fa0/0 overload
+
+end

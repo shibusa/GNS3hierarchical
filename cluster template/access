@@ -1,0 +1,13 @@
+version 12.4
+
+hostname ACC{hostnum}0
+
+int range fa1/{portstart} - {portend}
+switchport access vlan {accvlan}
+switchport mode access
+spanning-tree portfast
+speed 100
+duplex full
+no shutdown
+
+end

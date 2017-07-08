@@ -1,0 +1,46 @@
+vlan data
+vlan 2 name MGMT
+vlan 3 name OSPF
+vlan 4 name INTERCORE
+vlan 10 name 10
+vlan 20 name 20
+vlan 30 name 30
+vtp transparent
+exit
+
+conf t
+no ip domain-lookup
+
+int fa1/15
+no shutdown
+speed 100
+duplex full
+switchport access vlan 2
+switchport mode access
+
+int vlan 2
+no shutdown
+ip add 10.2.0.1 255.255.0.0
+
+service password-encryption
+username admin privilege 15 secret admin
+
+ip ssh version 2
+ip default-gateway 10.2.255.254
+ip domain-name shibusa.io
+crypto key generate rsa
+2048
+
+line console 0
+logging synchronous
+login local
+
+line vty 0 4
+transport input ssh
+login local
+
+archive
+path flash:archive
+write-memory
+
+do wr

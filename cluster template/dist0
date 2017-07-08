@@ -1,0 +1,52 @@
+version 12.4
+
+ip routing
+ip cef
+
+hostname DIST0{hostnum}
+spanning-tree vlan {accvlan} priority {accstppriority}
+
+int range fa0/0 - 1
+no shutdown
+speed 100
+duplex full
+
+int fa0/0
+ip add 172.16.0.{id} 255.255.255.0
+ip ospf priority 0
+
+int fa0/1
+ip add 172.16.1.{id} 255.255.255.0
+ip ospf priority 0
+
+int range fa1/{bundleportstart} - {accportend}
+switchport access vlan {accvlan}
+switchport mode access
+speed 100
+duplex full
+no shutdown
+
+int range fa1/{bundleportstart} - {bundleportend}
+channel-group {bundlenum} mode on
+
+int po{bundlenum}
+switchport access vlan {accvlan}
+switchport mode access
+duplex full
+no shutdown
+
+int vlan {accvlan}
+ip address 10.0.{accvlan}.{vrrpip} 255.255.255.0
+ip ospf network point-to-point
+vrrp 1 ip 10.0.{accvlan}.1
+vrrp 1 priority 200
+no shutdown
+
+router ospf 1
+router-id 10.2.1.{id}
+maximum-paths 2
+network 10.0.{accvlan}.0 0.0.0.255 area 0
+network 172.16.0.0 0.0.0.255 area 0
+network 172.16.1.0 0.0.0.255 area 0
+
+end
