@@ -9,16 +9,16 @@ Hierarchical network topology built in GNS3.  Deployed with [Cluster](https://gi
 - GNS3 2.0.2 running c3725-adventerprisek9-mz.124-25d.bin image
 - VirtualBox 5.1.22 running Centos 7.3
 
-###Naming Convention
+### Naming Convention
 Layer - Pair # - Device # in Pair
 DIST21 - 2nd device in 3rd distribution layer pair
 
-###All non-management VLAN devices
+### All non-management VLAN devices
 | Interface(s) | VLAN | Network | Description |
 | --- | --- | --- | --- |
 | Fa1/15 | MGMT | 10.2.0.0/16 | All devices have Fa1/15 set up as the management interface. |
 
-###Core Layer
+### Core Layer
 | Interface(s) | VLAN | Network | Description |
 | --- | --- | --- | --- |
 | Fa0/0 | | 1.0.x.1/30 | Uplink to ISP |
@@ -29,7 +29,7 @@ DIST21 - 2nd device in 3rd distribution layer pair
 
 Core layer switches are designated routers for their respective networks which are both in OSPF area 0.  This allows for multi-pathing across the area and ensures traffic on both devices.
 
-###Distribution Layer
+### Distribution Layer
 | Interface(s) | VLAN | Network | Description |
 | --- | --- | --- | --- |
 | Fa0/0 | | 172.16.x.0/24 | Connects to CORE00 Network for OSPF Area0 |
